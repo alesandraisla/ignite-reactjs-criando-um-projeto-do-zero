@@ -32,6 +32,23 @@ export default function Home() {
               </ul>
             </a>
           </Link>
+          <Link href="/">
+            <a className={styles.post}>
+              <strong>Exemplo</strong>
+              <p>Lorem ipsum dolor sit, amet consectetur adipisicing</p>
+              <ul>
+                <li>
+                  <FiCalendar />
+                  15 Mar 2021
+                </li>
+                <li>
+                  <FiUser />
+                  Alesandra Marinho
+                </li>
+              </ul>
+            </a>
+          </Link>
+          <button type="button">Carregar mais posts</button>
         </div>
       </main>
     </>
