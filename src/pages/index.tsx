@@ -2,52 +2,76 @@
 import Link from 'next/link';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 import Header from '../components/Header';
-
+import Prismic from '@prismicio/client';
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
+import { GetStaticProps } from 'next';
+import { getPrismicClient } from '../services/prismic';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { useState } from 'react';
+
+interface Post {
+  uid?: string;
+  first_publication_date: string | null;
+  data: {
+    title: string;
+    subtitle: string;
+    author: string;
+  };
+}
+
+interface PostPagination {
+  next_page: string;
+  results: Post[];
+}
+interface HomeProps {
+  postsPagination: PostPagination;
+}
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export default function Home() {
+export default function Home({ postsPagination }: HomeProps): JSX.Element {
+  const formattedPost = postsPagination.results.map(post => {
+    return {
+      ...post,
+      first_publication_date: format(
+        new Date(post.first_publication_date),
+        'dd MMM yyyy',
+        {
+          locale: ptBR,
+        }
+      ),
+    };
+  });
+
+  const [posts, setPosts] = useState<Post[]>(formattedPost);
+
   return (
     <>
       <main className={commonStyles.container}>
         <Header />
         <div className={styles.posts}>
-          <Link href="/">
-            <a className={styles.post}>
-              <strong>Exemplo</strong>
-              <p>Lorem ipsum dolor sit, amet consectetur adipisicing</p>
-              <ul>
-                <li>
-                  <FiCalendar />
-                  15 Mar 2021
-                </li>
-                <li>
-                  <FiUser />
-                  Alesandra Marinho
-                </li>
-              </ul>
-            </a>
-          </Link>
-          <Link href="/">
-            <a className={styles.post}>
-              <strong>Exemplo</strong>
-              <p>Lorem ipsum dolor sit, amet consectetur adipisicing</p>
-              <ul>
-                <li>
-                  <FiCalendar />
-                  15 Mar 2021
-                </li>
-                <li>
-                  <FiUser />
-                  Alesandra Marinho
-                </li>
-              </ul>
-            </a>
-          </Link>
+          {posts.map(post => (
+            <Link href={`/post/${post.uid}`} key={post.uid}>
+              <a className={styles.post}>
+                <strong>{post.data.title}</strong>
+                <p>{post.data.subtitle}</p>
+                <ul>
+                  <li>
+                    <FiCalendar />
+                    {post.first_publication_date}
+                  </li>
+                  <li>
+                    <FiUser />
+                    {post.data.author}
+                  </li>
+                </ul>
+              </a>
+            </Link>
+          ))}
           <button type="button">Carregar mais posts</button>
         </div>
       </main>
@@ -55,9 +79,34 @@ export default function Home() {
   );
 }
 
-// export const getStaticProps = async () => {
-//   // const prismic = getPrismicClient();
-//   // const postsResponse = await prismic.query(TODO);
+export const getStaticProps: GetStaticProps = async () => {
+  const prismic = getPrismicClient();
+  const postsResponse = await prismic.query(
+    [Prismic.Predicates.at('document.type', 'posts')],
+    {
+      pageSize: 31,
+    }
+  );
+  const posts = postsResponse.results.map(post => {
+    return {
+      uid: post.uid,
+      first_publication_date: post.first_publication_date,
+      data: {
+        title: post.data.title,
+        subtitle: post.data.subtitle,
+        author: post.data.author,
+      },
+    };
+  });
 
-//   // TODO
-// };
+  const postsPagination = {
+    next_page: postsResponse.next_page,
+    results: posts,
+  };
+
+  return {
+    props: {
+      postsPagination,
+    },
+  };
+};
