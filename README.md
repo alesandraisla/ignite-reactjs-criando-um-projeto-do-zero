@@ -22,6 +22,6 @@ Modelo responsivo.
 <h2>Layout Mobile e Desktop</h2>
 
 <div align="center">
-     <img src="./public/desktop.png" width="250px" align="center"> 
+     <img src="./public/desktop.png" width="600px" align="center"> 
      <img src="./public/mobile.png" width="250px" align="center"> 
 </div>
