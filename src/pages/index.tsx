@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import Link from 'next/link';
-import { FiCalendar, FiUser } from 'react-icons/fi';
+import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
 import Prismic from '@prismicio/client';
 import { GetStaticProps } from 'next';
 import { format } from 'date-fns';
