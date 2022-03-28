@@ -139,7 +139,7 @@ export const getStaticProps: GetStaticProps = async context => {
       subtitle: response.data.subtitle,
       author: response.data.author,
       banner: {
-        url: response.data.author,
+        url: response.data.banner.url,
       },
       content: response.data.content.map(content => {
         return {
